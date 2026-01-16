@@ -1,0 +1,21 @@
+{
+  "plugin": [
+    "opencode-antigravity-auth@beta"
+  ],
+  "provider": {
+    "google": {
+      "models": {
+         "antigravity-claude-sonnet-4-5-thinking": {
+           "name": "Claude Sonnet 4.5 Thinking",
+           "limit": { "context": 200000, "output": 64000 },
+           "modalities": { "input": ["text", "image", "pdf"], "output": ["text"] },
+           "variants": {
+             "low": { "thinkingConfig": { "thinkingBudget": 8192 } },
+             "max": { "thinkingConfig": { "thinkingBudget": 32768 } }
+           }
+         }
+      }
+    }
+  },
+  "$schema": "https://opencode.ai/config.json"
+}

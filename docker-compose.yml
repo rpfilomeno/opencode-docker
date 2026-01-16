@@ -31,9 +31,8 @@ services:
       - TZ=Asia/Manila
       - USER_PASSWORD=123456
     volumes:
-      - D:\Github\opencode-docker\root:/root
-      - D:\Github\opencode-docker\home:/home
-      - D:\Github\opencode-docker\data:/data
+      - D:\Github\opencode-docker\workspace:/home/workspace
+
     logging:
       options:
         max-size: "10m"
@@ -43,3 +42,4 @@ services:
 
 volumes:
   tailscale-data:
+

@@ -1,4 +1,4 @@
-FROM ubuntu:24.04
+FROM ubuntu:26.04
 
 # Set common environment variables
 ENV DEBIAN_FRONTEND=noninteractive
@@ -9,14 +9,13 @@ ENV LANGUAGE=en_US.UTF-8
 # Password for ssh
 ENV USER_PASSWORD=123456
 
-# Copy to image
-COPY deploy /
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # Install
 RUN apt-get update && apt-get -y upgrade \
     && apt-get install -y openssh-server \
     # Utils
-    && apt-get install -y mc htop iotop ncdu tar zip nano vim bash sudo sed fzf wget ca-certificates curl unzip gnupg fzf tmux build-essential git ninja-build gettext cmake lazygit fd-find ripgrep tree-sitter-cli\
+    && apt-get install -y mc htop iotop ncdu tar zip nano vim bash sudo sed fzf wget ca-certificates curl unzip gnupg fzf tmux build-essential git ninja-build gettext cmake lazygit fd-find ripgrep tree-sitter-cli neovim gh age \
     # Net utils
     && apt-get install -y iputils-ping traceroute telnet dnsutils iperf nmap \
     # Deleting keys
@@ -39,38 +38,8 @@ RUN apt-get update && apt-get -y upgrade \
     && rm -rf /var/tmp/* \
     && rm -rf /usr/share/doc/ \
     && rm -rf /usr/share/man/ \
-    && rm -rf $HOME/.cache \
-    && chmod +x /entrypoint.sh
+    && rm -rf $HOME/.cache
 
-
-# Install GitHub CLI (gh)
-RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg \
-    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
-    && apt-get update \
-    && apt-get install -y gh \
-    # Clean up APT lists
-    && rm -rf /var/lib/apt/lists/*
-
-
-
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-ENV MISE_DATA_DIR="/mise"
-ENV MISE_CONFIG_DIR="/mise"
-ENV MISE_CACHE_DIR="/mise/cache"
-ENV MISE_INSTALL_PATH="/usr/local/bin/mise"
-ENV PATH="/mise/shims:$PATH"
-RUN mkdir /mise
-RUN curl https://mise.run | sh
-RUN mise use -g node
-RUN mise use -g go 
-RUN mise use -g python
-RUN mise use -g rust
-
-#Istall age
-RUN go install filippo.io/age/cmd/...@latest
-
-#Install Zoxide
-RUN curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
 
 # Install Superfile
 RUN bash -c "$(curl -sLo- https://superfile.dev/install.sh)"
@@ -81,18 +50,26 @@ RUN curl -sS https://starship.rs/install.sh | sh -s -- --yes
 # Install UV
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Install Lazyvim
+RUN curl https://mise.run | MISE_INSTALL_PATH=/usr/local/bin/mise sh
 
-RUN curl -LO --create-dirs --output-dir /opt/nvim https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.appimage \
-    && chmod u+x nvim-linux-x86_64.appimage \
-    && ./nvim-linux-x86_64.appimage
+#Install Zoxide
+RUN curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh -s - --bin-dir /usr/local/bin/
+
 
 # Create a non-root user
 RUN echo "ubuntu ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/ubuntu \
     && chmod 0440 /etc/sudoers.d/ubuntu
 
+#RUN useradd -rm -d /home/ubuntu -s /bin/bash -g root -G sudo ubuntu
+RUN echo 'ubuntu:ubuntu' | chpasswd
+
+COPY scripts /home/ubuntu
+RUN chown -R ubuntu:ubuntu /home/ubuntu
+
+
 USER ubuntu
 WORKDIR /home/ubuntu
+RUN eval "$(mise activate bash)"
 
 # Prepare SSH configuration
 RUN mkdir -p /home/ubuntu/.ssh \
@@ -101,21 +78,25 @@ RUN mkdir -p /home/ubuntu/.ssh \
 # Preload GitHub host keys (non-interactive Git usage)
 RUN ssh-keyscan -T 5 github.com 2>/dev/null >> /home/ubuntu/.ssh/known_hosts || true
 
-RUN mkdir -p /home/ubuntu/.config \
-    && git clone https://github.com/LazyVim/starter /home/ubuntu/.config/nvim \
+RUN git clone https://github.com/LazyVim/starter /home/ubuntu/.config/nvim \
     && rm -rf /home/ubuntu/.config/nvim/.git
 
+RUN mise use -g node
+RUN mise use -g go 
+RUN mise use -g python
+RUN mise use -g rust
+RUN mise use -g opencode
 
-# Install OpenCode AI (Native Binary Method)
-# https://opencode.ai/docs/
-RUN curl -fsSL https://opencode.ai/install | bash
-
-RUN npm install -g @google/gemini-cli
-
-EXPOSE 22/tcp
 
 USER root
 
-ENTRYPOINT ["/entrypoint.sh"]
+RUN mkdir -p /workspace
+RUN chown -R ubuntu:ubuntu /workspace
 
+
+COPY deploy /
+RUN chmod +x /entrypoint.sh
+
+EXPOSE 22/tcp
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["/usr/sbin/sshd", "-D"]
