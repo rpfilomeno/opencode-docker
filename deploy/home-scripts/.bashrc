@@ -10,3 +10,6 @@ eval "$(mise activate bash)"
 
 bind -x '"\t": fzf_bash_completion'
 
+if [ -n "$SSH_TTY" ]; then
+    fastfetch
+fi

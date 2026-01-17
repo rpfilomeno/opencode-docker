@@ -11,17 +11,24 @@ ENV USER_PASSWORD=123456
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-# Install
+
+# Install core
 RUN apt-get update && apt-get -y upgrade \
     && apt-get install -y openssh-server \
     # Utils
     && apt-get install -y mc htop iotop ncdu tar zip nano vim bash sudo sed fzf wget ca-certificates curl unzip gnupg fzf tmux build-essential git ninja-build gettext cmake lazygit fd-find ripgrep tree-sitter-cli neovim gh age byobu fastfetch \
     # Net utils
     && apt-get install -y iputils-ping traceroute telnet dnsutils iperf nmap
-    
+
+# Install Extras
+RUN mkdir -p /etc/apt/keyrings \
+    && curl -fsSL https://repo.charm.sh/apt/gpg.key | gpg --dearmor -o /etc/apt/keyrings/charm.gpg \
+    && echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | tee /etc/apt/sources.list.d/charm.list \
+    && sudo apt update && sudo apt install gum exa bat
+
 # Deleting keys
 RUN rm -rf /etc/ssh/ssh_host_dsa* /etc/ssh/ssh_host_ecdsa* /etc/ssh/ssh_host_ed25519* /etc/ssh/ssh_host_rsa*
-    
+
 # Config SSH
 RUN sed -ri "s|^#PermitRootLogin|PermitRootLogin|" /etc/ssh/sshd_config \
     && sed -i "s|PermitRootLogin without-password|PermitRootLogin yes|" /etc/ssh/sshd_config \
@@ -30,7 +37,7 @@ RUN sed -ri "s|^#PermitRootLogin|PermitRootLogin|" /etc/ssh/sshd_config \
     && sed -ri "s|^#PasswordAuthentication|PasswordAuthentication|" /etc/ssh/sshd_config \
     && sed -ri "s|^PasswordAuthentication no|PasswordAuthentication yes|" /etc/ssh/sshd_config \
     && sed -ri "s|UsePAM yes|#UsePAM yes|g" /etc/ssh/sshd_config
-    
+
 # Cleaning
 RUN apt-get clean autoclean -y \
     && apt-get autoremove -y \
@@ -39,8 +46,8 @@ RUN apt-get clean autoclean -y \
     && rm -rf /var/log/* \
     && rm -rf /tmp/* \
     && rm -rf /var/tmp/* \
-    && rm -rf /usr/share/doc/ \
-    && rm -rf /usr/share/man/ \
+    #    && rm -rf /usr/share/doc/ \
+    #    && rm -rf /usr/share/man/ \
     && rm -rf $HOME/.cache
 
 
