@@ -1,5 +1,4 @@
-export PATH="$PATH:$HOME/go/bin"
-
+export PATH="$PATH:$HOME/go/bin:$HOME/.cargo/bin:$HOME/.local/bin"
 eval "$(starship init bash)"
 
 eval "$(zoxide init bash --cmd cd)"

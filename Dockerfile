@@ -24,7 +24,7 @@ RUN apt-get update && apt-get -y upgrade \
 RUN mkdir -p /etc/apt/keyrings \
     && curl -fsSL https://repo.charm.sh/apt/gpg.key | gpg --dearmor -o /etc/apt/keyrings/charm.gpg \
     && echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | tee /etc/apt/sources.list.d/charm.list \
-    && sudo apt update && sudo apt install gum exa bat
+    && sudo apt update && sudo apt install -y gum eza bat
 
 # Deleting keys
 RUN rm -rf /etc/ssh/ssh_host_dsa* /etc/ssh/ssh_host_ecdsa* /etc/ssh/ssh_host_ed25519* /etc/ssh/ssh_host_rsa*
@@ -97,6 +97,7 @@ RUN mise use -g python
 RUN mise use -g rust
 RUN mise use -g opencode
 
+RUN /home/ubuntu/.cargo/bin/cargo install --locked --git https://github.com/asciinema/asciinema
 RUN mkdir -p /home/ubuntu/workspace
 
 USER root
