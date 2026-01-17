@@ -15,7 +15,7 @@ services:
     restart: unless-stopped
 
   opencode:
-    build: .
+    image: rpfilomeno/opencode:latest
     container_name: opencode
     deploy:
       resources:
