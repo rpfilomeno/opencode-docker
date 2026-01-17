@@ -4,7 +4,7 @@ services:
     image: tailscale/tailscale:latest
     hostname: opencode
     environment:
-      - TS_AUTHKEY=tskey-auth-kPnASMci2D11CNTRL-kx2QfEZyeDc51TsdMSZ5Ec4tZ7hK98yjK # Generate in Admin Console
+      - TS_AUTHKEY=${TAILSCALE_AUTHKEY} #Generate in Tailscale Admin Console
       - TS_STATE_DIR=/var/lib/tailscale
     volumes:
       - tailscale-data:/var/lib/tailscale
@@ -29,9 +29,11 @@ services:
     network_mode: service:ts-sidecar
     environment:
       - TZ=Asia/Manila
-      - USER_PASSWORD=123456
+      - USER_PASSWORD=${USER_PASSWORD}
     volumes:
-      - D:\Github\opencode-docker\workspace:/home/workspace
+      - ./workspace:/home/ubuntu/workspace
+      - ./config/opencode:/home/ubuntu/.config/opencode
+      - ./config/nvim:/home/ubuntu/.config/nvim
 
     logging:
       options:

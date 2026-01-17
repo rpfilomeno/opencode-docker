@@ -17,7 +17,7 @@ if [ -f /.ispasswordset ]; then
     echo "Password already set"
 else
     echo "Set  password of user for sshd"
-    echo 'root:'${USER_PASSWORD} |chpasswd
+    echo 'ubuntu:'${USER_PASSWORD} |chpasswd
     touch /.ispasswordset
 fi
 
