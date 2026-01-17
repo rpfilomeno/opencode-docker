@@ -2,6 +2,9 @@
 
 This project provides a secure, isolated Docker environment designed for running **Opencode** agents. It features a fully-featured development environment accessible remotely via **OpenSSH** over a secure **Tailscale** VPN mesh network.
 
+![Opencode Docker Demo](https://cdn.rogverse.fyi/WindowsTerminal_1BCHwo8nFM.gif)
+
+
 ## 🚀 Features
 
 *   **Secure Isolation**: Runs in a self-contained container based on Ubuntu.
