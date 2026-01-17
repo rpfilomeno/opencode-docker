@@ -69,7 +69,7 @@ RUN chown -R ubuntu:ubuntu /home/ubuntu
 
 USER ubuntu
 WORKDIR /home/ubuntu
-RUN eval "$(mise activate bash)"
+RUN source .bashrc
 
 # Prepare SSH configuration
 RUN mkdir -p /home/ubuntu/.ssh \
@@ -89,7 +89,8 @@ RUN mise use -g opencode
 
 
 USER root
-
+COPY skill /home/ubuntu/.config/opencode/skill
+RUN chown -R ubuntu:ubuntu /home/ubuntu/.config/opencode/skill
 RUN mkdir -p /workspace
 RUN chown -R ubuntu:ubuntu /workspace
 
