@@ -34,6 +34,7 @@ This project provides a secure, isolated Docker environment designed for running
     ```bash
     TAILSCALE_AUTHKEY=tskey-auth-xxxxx-xxxxxxxxx  # Your Tailscale Auth Key
     USER_PASSWORD=secretpassword                  # Password for the 'ubuntu' user
+    TZ=Asia/Manila                                # Your timezone
     ```
 
 3.  **Start the Container:**
