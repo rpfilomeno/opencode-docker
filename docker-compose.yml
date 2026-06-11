@@ -28,7 +28,7 @@ services:
     restart: unless-stopped
     network_mode: service:ts-sidecar
     environment:
-      - TZ=Asia/Manila
+      - TZ=${TZ}
       - USER_PASSWORD=${USER_PASSWORD}
     volumes:
       - ./workspace:/home/ubuntu/workspace
